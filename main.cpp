@@ -262,6 +262,7 @@ int main()
     SetTargetFPS(60);
     
     Sound shot = LoadSound("rsc/shoot.wav");
+    Sound exp = LoadSound("rsc/explosion.wav");
 
     Plane player(0,0,100,100);
     Projectile p[10];
@@ -324,6 +325,8 @@ int main()
                         p[j].x = -8768687;//byle jak najdalej z tąd
                         h[i].setHelicopter(helicopterRandomPosition(),-200);
                         score+=10;
+                        PlaySound(exp);
+
                     }
                 }
             }   
@@ -338,6 +341,7 @@ int main()
                         p[j].x = -8768687;//byle jak najdalej z tąd
                         b[i].setBoat(boatRandomPosition(),-200);
                         score+=5;
+                        PlaySound(exp);
                     }
                 }
             }
@@ -351,9 +355,9 @@ int main()
             if(lastProjectile >= 10)lastProjectile = 0;
             if(IsKeyReleased(KEY_SPACE))
             {
-                p[lastProjectile].shot(player.x+player.width/2-10,player.y+player.height/3*2);
+                p[lastProjectile].shot(player.x+player.width/2-10/2,player.y+player.height/3*2);
                 lastProjectile++;
-               // PlaySound(shot);
+                PlaySound(shot);
             }
             ClearBackground(DARKBLUE);
             m.drawMap();
@@ -470,6 +474,7 @@ int main()
         EndDrawing();
     }
     UnloadSound(shot);
+    UnloadSound(exp);
     CloseAudioDevice();
     CloseWindow();
 }

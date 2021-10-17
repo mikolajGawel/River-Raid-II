@@ -9,4 +9,4 @@ Cały kod gry był napisany w ciągu 3 dni(10.10.2021 - 12.10.2021).
   
 
 
-Mikołaj Gaweł-Kucab
+Mikołaj Gaweł-Kucab 
