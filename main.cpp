@@ -12,6 +12,12 @@ enum game_status
 {
     MENU,IN_GAME,GAME_OVER
 };
+enum death_reason
+{
+    OUT_FROM_MAP,
+    COLLISION_WITH_HELICOPTER,
+    COLLISION_WITH_BOAT
+};
 #define WIDTH 800 //szerokość okna
 #define HEIGHT 600 //wysokość okna
 //szybkość gracza
@@ -253,7 +259,7 @@ int main()
 {
     int best_score = 0;
     int score = 0;
-
+    int _death_reason;
     bool debug = false;
     int status =  MENU;
     srand(time(NULL));
@@ -291,28 +297,29 @@ int main()
         { 
             //sprawdzanie czy gracz dodknął ściany bocznej
             if(CheckCollisionRecs((Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height},(Rectangle){(float)m.lmx,(float)m.lmy,100.0f,(float)HEIGHT}) == true)
-            {status = GAME_OVER;}
+            {status = GAME_OVER;_death_reason = OUT_FROM_MAP;}
             if(CheckCollisionRecs((Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height},(Rectangle){(float)m.lmx2,(float)m.lmy2,100.0f,(float)HEIGHT}) == true)
-            {status = GAME_OVER;}
+            {status = GAME_OVER;_death_reason = OUT_FROM_MAP;}
             if(CheckCollisionRecs((Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height},(Rectangle){(float)m.rmx,(float)m.rmy,100.0f,(float)HEIGHT}) == true)
-            {status = GAME_OVER;}
+            {status = GAME_OVER;_death_reason = OUT_FROM_MAP;}
             if(CheckCollisionRecs((Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height},(Rectangle){(float)m.rmx2,(float)m.rmy2,100.0f,(float)HEIGHT}) == true)
-            {status = GAME_OVER;}
+            {status = GAME_OVER;_death_reason = OUT_FROM_MAP;}
        
             //sprawdzenie czy gracz jest poza mapą
             if(player.y > HEIGHT/6*5 || player.y+player.height < 0)
             {
                 status = GAME_OVER;
+                _death_reason = OUT_FROM_MAP;
             }
             //sprawdzenie czy gracz dotyka helikopterów
             for(int i = 0;i < 3;i++)
             {
                 if(CheckCollisionRecs((Rectangle){(float)h[i].x,(float)h[i].y,(float)h[i].w,(float)h[i].h},(Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height}))
-                {status = GAME_OVER;} 
+                {status = GAME_OVER;_death_reason = COLLISION_WITH_HELICOPTER;} 
             }  for(int i = 0;i < 3;i++)
             {
                 if(CheckCollisionRecs((Rectangle){(float)b[i].x,(float)b[i].y,(float)b[i].w,(float)b[i].h},(Rectangle){(float)player.x,(float)player.y,(float)player.width,(float)player.height}))
-                {status = GAME_OVER;} 
+                {status = GAME_OVER;_death_reason = COLLISION_WITH_BOAT;} 
             }
             //sprawdzenie czy pocisk w coś trafił
             for(int i = 0;i < 3;i++)
@@ -337,8 +344,8 @@ int main()
                   
                     if(CheckCollisionRecs((Rectangle){(float)p[j].x,(float)p[j].y,10.0f,30.0f},(Rectangle){(float)b[i].x,(float)b[i].y,(float)b[i].w,(float)b[i].h}) == true)
                     {
-                        p[j].created = false;
                         p[j].x = -8768687;//byle jak najdalej z tąd
+                        p[j].created = false;
                         b[i].setBoat(boatRandomPosition(),-200);
                         score+=5;
                         PlaySound(exp);
@@ -404,7 +411,22 @@ int main()
          
             player.drawDestroyed();
             DrawRectangle(0,HEIGHT/6*5,WIDTH,HEIGHT/5,BLACK);
-            DrawText(FormatText("!Koniec Gry \nkliknij spacje aby zagrac ponownie/n Wynik: %i",score),100,HEIGHT/6*5,18,WHITE);
+            switch(_death_reason)
+            {
+                case OUT_FROM_MAP:
+                     DrawText(FormatText("!Koniec Gry: wyszles po za mape gry \nkliknij spacje aby zagrac ponownie\n Wynik: %i",score),100,HEIGHT/6*5,18,WHITE);
+                     break;
+                case COLLISION_WITH_HELICOPTER:
+                    DrawText(FormatText("!Koniec Gry: zderzyles sie z helikopterem \nkliknij spacje aby zagrac ponownie\n Wynik: %i",score),100,HEIGHT/6*5,18,WHITE);
+                    break;
+                     
+                case COLLISION_WITH_BOAT:
+                    DrawText(FormatText("!Koniec Gry: zderzyles sie z lodka \nkliknij spacje aby zagrac ponownie\n Wynik: %i",score),100,HEIGHT/6*5,18,WHITE);
+                    break;
+                default:
+                       DrawText(FormatText("!Koniec Gry \nkliknij spacje aby zagrac ponownie\n Wynik: %i",score),100,HEIGHT/6*5,18,WHITE);
+            }
+         
 
             if(debug)
             { 
