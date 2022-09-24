@@ -1,0 +1,8 @@
+shooting [SPACE]
+
+move forwad[W]
+move backward[S]
+move left[A]
+move right[D]
+
+restart[R]
